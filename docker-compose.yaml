@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  tempfetcher:
+    build:
+      context: .
+      dockerfile: dockerfiles/tempfetcher.dockerfile
+    env_file:
+      - ./env/tempfetcher.env
+  
+  mongodb:
+    image: 'mongo'
+    volumes: 
+      - data:/data/db
+    env_file:
+      - ./env/mongo.env
+
+volumes:
+  data:
+
