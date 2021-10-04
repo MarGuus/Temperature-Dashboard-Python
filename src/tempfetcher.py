@@ -9,7 +9,7 @@ import pymongo
 sched = BlockingScheduler()
 
 
-@sched.scheduled_job('interval', seconds=15)
+@sched.scheduled_job('interval', minutes=15)
 def tempmonitor():
     
     #get environment variables
