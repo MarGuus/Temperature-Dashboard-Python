@@ -22,9 +22,9 @@ services:
       context: .
       dockerfile: dockerfiles/dash_app.dockerfile
     env_file:
-    - ./env/dash_app.env
+    - ./env/dashapp.env
     ports:
-      - '8050:8050'
+      # - '8050:8050'
       - '8000:8000'
 
 
