@@ -9,9 +9,9 @@ import pymongo
 sched = BlockingScheduler()
 
 
-@sched.scheduled_job('interval', minutes=15)
+@sched.scheduled_job('interval', seconds=15)
 def tempmonitor():
-    
+    print("TEST!")
     #get environment variables
     username = os.environ['MONGO_INITDB_ROOT_USERNAME']
     password = os.environ['MONGO_INITDB_ROOT_PASSWORD']
