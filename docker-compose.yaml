@@ -8,7 +8,10 @@ services:
       - ./env/tempfetcher.env
   
   mongodb:
-    image: 'mongo'
+    # image: 'mongo'
+    build:
+      context: .
+      dockerfile: dockerfiles/mongo.dockerfile
     volumes: 
       - data:/data/db
     env_file:
