@@ -33,12 +33,16 @@ def tempmonitor():
     
     myclient = pymongo.MongoClient(f"mongodb://{username}:{password}@mongodb:27017/")
     db = myclient['database']
-    coll = db['collection']
+    coll = db['tempcollection']
 
-    #test the database connection
-    mydict = { "name": "mage", "address": "test" }
+    #insert the fetched record to database
+    tempRecord = {
+        "timestamp" : formatted_time,
+        "temperature": jsondata['temperature'], 
+        "humidity": jsondata['humidity']
+        }
 
-    x = coll.insert_one(mydict)
+    x = coll.insert_one(tempRecord)
     
     print(x.inserted_id)
 

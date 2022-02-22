@@ -1,14 +1,18 @@
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
 from dash.dependencies import Input, Output
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 import flask
+import os
+import pymongo
 
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+username = os.environ['MONGO_INITDB_ROOT_USERNAME']
+password = os.environ['MONGO_INITDB_ROOT_PASSWORD']
 
 server = flask.Flask(__name__) # define flask app.server
 
@@ -46,7 +50,14 @@ app.layout = html.Div(children=[
     Output('tempnow','children'),
     Input('timespan', 'value'))
 def update_graph(timespan):
-    dff = pd.read_csv(timespan+'_output.csv')
+
+    myclient = pymongo.MongoClient(f"mongodb://{username}:{password}@mongodb:27017/")
+    db = myclient.database
+    collection = db.tempcollection
+
+
+    # dff = pd.read_csv(timespan+'_output.csv')
+    dff = pd.DataFrame(list(collection.find()))
     
     temp_fig = px.line(dff, x = 'timestamp', y = 'temperature', title='Temperature inside',
                        labels={
