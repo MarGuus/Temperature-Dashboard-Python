@@ -75,17 +75,19 @@ def update_graph(timespan):
                            "temperature":"Temperature (°C)"                           
                            })
     
-    temp_fig.update_traces(line_color='#FF0000', selector=dict(type='scatter'))
+    
     
     hum_fig = px.line(dff, x = 'timestamp', y = 'humidity', title='Humidity inside',
                       labels={
                           "timestamp":"Time",
-                          "humidity":"Humidity (%)"                          
+                          "humidity":"Humidity (%)"
                           })
-    
-    hum_fig.update_traces(line_color='#0000FF', selector=dict(type='scatter'))
-    tempnow = "{}°C".format(dff.tail(1).temperature.to_string(index=False))
 
+    tempnow = "{}°C".format(dff.tail(1).temperature.to_string(index=False))
+    #hum_fig.update_traces(line_color='#0000FF', selector=dict(type='scatter'))
+    #temp_fig.update_traces(line_color='#FF0000', selector=dict(type='scatter'))
+    temp_fig['data'][0]['line']['color']='rgb(255, 0, 0)'
+    hum_fig['data'][0]['line']['color']='rgb(3, 0, 125)'
     return temp_fig,hum_fig,tempnow
 
 def get_start_and_end():
