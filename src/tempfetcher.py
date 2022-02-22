@@ -11,7 +11,6 @@ sched = BlockingScheduler()
 
 @sched.scheduled_job('interval', seconds=15)
 def tempmonitor():
-    print("TEST!")
     #get environment variables
     username = os.environ['MONGO_INITDB_ROOT_USERNAME']
     password = os.environ['MONGO_INITDB_ROOT_PASSWORD']
@@ -28,8 +27,8 @@ def tempmonitor():
     formatted_time = datetime.fromisoformat(str(jsondata['timestamp']))
     formatted_time += timedelta(hours=3)
     
-    values = [str(formatted_time),str(jsondata['temperature']),str(jsondata['humidity'])]
-    values = ",".join(values)
+    # values = [str(formatted_time),str(jsondata['temperature']),str(jsondata['humidity'])]
+    # values = ",".join(values)
     
     myclient = pymongo.MongoClient(f"mongodb://{username}:{password}@mongodb:27017/")
     db = myclient['database']
@@ -43,8 +42,6 @@ def tempmonitor():
         }
 
     x = coll.insert_one(tempRecord)
-    
-    print(x.inserted_id)
 
 sched.start()
 

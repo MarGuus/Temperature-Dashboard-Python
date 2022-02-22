@@ -11,4 +11,4 @@ EXPOSE 3000
 
 #CMD [ "python","-u" ,"./app.py" ]
 
-CMD [ "gunicorn", "--workers=1", "--threads=1", "-b 0.0.0.0:8000", "app:server"]
+CMD [ "gunicorn", "--workers=2", "--threads=4", "-b 0.0.0.0:8000", "app:server"]

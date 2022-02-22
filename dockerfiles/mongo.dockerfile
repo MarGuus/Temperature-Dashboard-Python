@@ -1,3 +1,3 @@
-FROM mongo:5.0.6
+FROM mongo:4.2
 
-COPY outputs/today_output.csv /data
+COPY outputs/archive.csv /data

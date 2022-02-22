@@ -8,6 +8,8 @@ import plotly.graph_objs as go
 import flask
 import os
 import pymongo
+from datetime import datetime, timedelta
+import pytz
 
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -57,7 +59,15 @@ def update_graph(timespan):
 
 
     # dff = pd.read_csv(timespan+'_output.csv')
-    dff = pd.DataFrame(list(collection.find()))
+    from_date, to_date = get_start_and_end()
+
+    if timespan == 'today':
+        query = {"timestamp": {"$gte": from_date, "$lt": to_date}}
+    else:
+        from_date -= timedelta(days=100)
+        query = {"timestamp": {"$gte": from_date, "$lt": to_date}}
+
+    dff = pd.DataFrame(list(collection.find(query)))
     
     temp_fig = px.line(dff, x = 'timestamp', y = 'temperature', title='Temperature inside',
                        labels={
@@ -77,6 +87,15 @@ def update_graph(timespan):
     tempnow = "{}°C".format(dff.tail(1).temperature.to_string(index=False))
 
     return temp_fig,hum_fig,tempnow
+
+def get_start_and_end():
+    tz = pytz.timezone('Europe/Helsinki')
+    today = datetime.now(tz=tz)
+    start = today.replace(hour=0, minute=0, second=0, microsecond=0)
+    end = start + timedelta(1)
+
+    return start, end
+
 
 if __name__ == '__main__':
     #app.run_server(debug=True,host="192.168.1.31", port=8050)
