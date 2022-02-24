@@ -5,11 +5,12 @@ import os
 from apscheduler.schedulers.blocking import BlockingScheduler
 from datetime import datetime, timedelta
 import pymongo
+import pytz
 
 sched = BlockingScheduler()
 
 
-@sched.scheduled_job('interval', seconds=15)
+@sched.scheduled_job('interval', minutes=15)
 def tempmonitor():
     #get environment variables
     username = os.environ['MONGO_INITDB_ROOT_USERNAME']
@@ -25,8 +26,10 @@ def tempmonitor():
    
     #parse ISO 8601 format data to datetime
     formatted_time = datetime.fromisoformat(str(jsondata['timestamp']))
-    formatted_time += timedelta(hours=3)
     
+    #formatted_time = pytz.timezone('Europe/Helsinki').localize(formatted_time)
+  
+    #formatted_time += timedelta(hours=3)
     # values = [str(formatted_time),str(jsondata['temperature']),str(jsondata['humidity'])]
     # values = ",".join(values)
     
@@ -41,9 +44,6 @@ def tempmonitor():
         "humidity": jsondata['humidity']
         }
 
-    x = coll.insert_one(tempRecord)
+    coll.insert_one(tempRecord)
 
 sched.start()
-
-
-
