@@ -58,7 +58,7 @@ def update_graph(timespan):
     collection = db.tempcollection
 
 
-    # dff = pd.read_csv(timespan+'_output.csv')
+    #dff = pd.read_csv(timespan+'_output.csv')
     from_date, to_date = get_start_and_end()
 
     if timespan == 'today':
@@ -68,6 +68,12 @@ def update_graph(timespan):
         query = {"timestamp": {"$gte": from_date, "$lt": to_date}}
 
     dff = pd.DataFrame(list(collection.find(query)))
+    
+    dff = dff.sort_values(["timestamp"]).reset_index(drop=True)
+    dff['timestamp'] = pd.to_datetime(dff['timestamp']).dt.tz_localize('UTC').dt.tz_convert('Europe/Helsinki')
+    
+   
+
     
     temp_fig = px.line(dff, x = 'timestamp', y = 'temperature', title='Temperature inside',
                        labels={
