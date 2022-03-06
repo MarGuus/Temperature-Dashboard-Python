@@ -29,7 +29,8 @@ app.layout = html.Div(children=[
         html.Div([
             dcc.Dropdown(
                 id='timespan',
-                options=[{'label': 'Today', 'value': 'today'},{'label': 'This week', 'value': 'this_week'},{'label': 'This month', 'value': 'this_month'}],
+                options=[{'label': 'Today', 'value': 'today'},{'label': 'This week', 'value': 'this_week'},
+                         {'label': 'This month', 'value': 'this_month'},{'label': 'All data', 'value': 'all'}],
                 value='today'
             ),            
         ],
@@ -59,13 +60,9 @@ def update_graph(timespan):
 
 
     #dff = pd.read_csv(timespan+'_output.csv')
-    from_date, to_date = get_start_and_end()
+    from_date, to_date = get_start_and_end(timespan)
 
-    if timespan == 'today':
-        query = {"timestamp": {"$gte": from_date, "$lt": to_date}}
-    else:
-        from_date -= timedelta(days=100)
-        query = {"timestamp": {"$gte": from_date, "$lt": to_date}}
+    query = {"timestamp": {"$gte": from_date, "$lt": to_date}}
 
     dff = pd.DataFrame(list(collection.find(query)))
     
@@ -96,11 +93,22 @@ def update_graph(timespan):
     hum_fig['data'][0]['line']['color']='rgb(3, 0, 125)'
     return temp_fig,hum_fig,tempnow
 
-def get_start_and_end():
+def get_start_and_end(timespan):
     tz = pytz.timezone('Europe/Helsinki')
-    today = datetime.now(tz=tz)
-    start = today.replace(hour=0, minute=0, second=0, microsecond=0)
-    end = start + timedelta(1)
+    today = datetime.now(tz=tz).replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    if timespan == 'today':
+        start = today
+        end = start + timedelta(1)
+    elif timespan == 'this_week':
+        start = today + timedelta(days=-today.weekday())
+        end = start + timedelta(7)
+    elif timespan == 'this_month':        
+        start = today + timedelta(days=-today.day + 1)
+        end = start + timedelta(31)
+    elif timespan == 'all':
+        start = datetime(1970, 1, 1)
+        end = today + timedelta(1)
 
     return start, end
 
