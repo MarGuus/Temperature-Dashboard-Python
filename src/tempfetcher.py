@@ -1,21 +1,20 @@
 import requests
 import json
-from os import path
-import os
 from apscheduler.schedulers.blocking import BlockingScheduler
-from datetime import datetime, timedelta
+from os import environ
+import datetime
 import pymongo
-import pytz
+
 
 sched = BlockingScheduler()
 
 
-@sched.scheduled_job('interval', minutes=15)
+@sched.scheduled_job('interval', minutes=20)
 def tempmonitor():
     #get environment variables
-    username = os.environ['MONGO_INITDB_ROOT_USERNAME']
-    password = os.environ['MONGO_INITDB_ROOT_PASSWORD']
-    URL = os.environ['SENSOR_API_URL']
+    username = environ['MONGO_INITDB_ROOT_USERNAME']
+    password = environ['MONGO_INITDB_ROOT_PASSWORD']
+    URL = environ['SENSOR_API_URL']
 
     page = requests.get(URL)
 
@@ -23,15 +22,19 @@ def tempmonitor():
 
     #parse JSON
     jsondata = json.loads(page.text)
-   
-    #parse ISO 8601 format data to datetime
-    formatted_time = datetime.fromisoformat(str(jsondata['timestamp']))
     
-    #formatted_time = pytz.timezone('Europe/Helsinki').localize(formatted_time)
-  
-    #formatted_time += timedelta(hours=3)
-    # values = [str(formatted_time),str(jsondata['temperature']),str(jsondata['humidity'])]
-    # values = ",".join(values)
+    #convert timestamp to dateobject
+    try:
+      formatted_time = datetime.datetime.strptime(jsondata['timestamp'], '%m/%d/%Y %H:%M:%S')
+    except:
+      print("API returned wrong format, fallign back to isoformat")
+      try:
+          formatted_time = datetime.datetime.fromisoformat(jsondata['timestamp'])
+          
+      except Exception as e:
+          print(e)
+          print("isoformat failed, giving up!")
+    
     
     myclient = pymongo.MongoClient(f"mongodb://{username}:{password}@mongodb:27017/")
     db = myclient['database']
